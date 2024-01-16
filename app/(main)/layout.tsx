@@ -1,5 +1,5 @@
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
-  return <h1>Hey</h1>;
+  return <div>{children}</div>;
 };
 
 export default MainLayout;
