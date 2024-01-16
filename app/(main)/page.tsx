@@ -12,7 +12,7 @@ const MainHome = () => {
       <div className="md:pl-[72px]">
         <SearchBar />
         <SearchHeader />
-        {/* <SearchBody /> */}
+        <SearchBody />
       </div>
     </div>
   );
