@@ -1,9 +1,9 @@
 "use client";
+import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useEffect, useState } from "react";
-import { LawItem } from "../laws/LawsItem";
 
-interface LawProps {
+interface LawDataProps {
   id: number;
   _id: string;
   doc_type: string;
@@ -30,18 +30,26 @@ interface LawProps {
   resultText: string;
 }
 
-export const SearchBody = () => {
-  const [laws, setLaws] = useState<LawProps[]>([]);
+export const SingleLaw = () => {
   const [error, setError] = useState(null);
+  const [law, setLaw] = useState<LawDataProps | null>(null);
+
+  const params = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data, error } = await supabase.from("laws").select("*");
+        const { data, error } = await supabase
+          .from("laws")
+          .select("*")
+          .eq("_id", params.lawId)
+          .single();
+
         if (error) {
           setError(error as any);
         } else {
-          setLaws(data);
+          console.log(data);
+          setLaw(data);
         }
       } catch (error: any) {
         setError(error);
@@ -51,17 +59,5 @@ export const SearchBody = () => {
     fetchData();
   }, []);
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  return (
-    <div className="flex px-56 pt-8">
-      <div className="flex flex-wrap">
-        {laws.map((law) => (
-          <LawItem law={law} key={law._id} />
-        ))}
-      </div>
-    </div>
-  );
+  return <div>{law?.resultText}</div>;
 };
