@@ -4,9 +4,16 @@ import Image from "next/image";
 import { History, LibraryBig, Search } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export const NavigationSidebar = () => {
   const [selected, setSelected] = useState(1);
+  const router = useRouter();
+
+  const handleClick = () => {
+    setSelected(2);
+    router.push("/library");
+  };
 
   return (
     <div className="flex flex-col h-full bg-[#FBFAF5] w-full border-r-[0.5px] border-[#DCD6D9]">
@@ -23,7 +30,7 @@ export const NavigationSidebar = () => {
             "flex flex-col items-center text-xs py-3 px-1.5 rounded cursor-pointer"
           )}
           onClick={() => setSelected(1)}>
-          <Search strokeWidth={1.25} className="" />
+          <Search strokeWidth={1.25} />
           <p>Search</p>
         </div>
         <div
@@ -31,7 +38,7 @@ export const NavigationSidebar = () => {
             selected === 2 ? "bg-[#EDEDE8] text-black" : "text-gray-500",
             "flex flex-col items-center text-xs py-3 px-1.5 rounded cursor-pointer"
           )}
-          onClick={() => setSelected(2)}>
+          onClick={handleClick}>
           <LibraryBig strokeWidth={1.25} />
           <p>Library</p>
         </div>
