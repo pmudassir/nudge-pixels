@@ -111,25 +111,25 @@ export const SingleLaw = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("laws")
-          .select("*")
-          .eq("_id", params.lawId)
-          .single();
+  const fetchData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("laws")
+        .select("*")
+        .eq("_id", params.lawId)
+        .single();
 
-        if (error) {
-          setError(error as any);
-        } else {
-          setLaw(data);
-        }
-      } catch (error: any) {
-        setError(error);
+      if (error) {
+        setError(error as any);
+      } else {
+        setLaw(data);
       }
-    };
+    } catch (error: any) {
+      setError(error);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
     fetchFolders();
   }, [handleCreateFolder]);
