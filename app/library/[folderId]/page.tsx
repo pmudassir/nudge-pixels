@@ -1,7 +1,11 @@
+import { Folder } from "@/components/folder/folder";
+import { LibraryNav } from "@/components/library/library-nav";
+
 const FolderPage = () => {
   return (
     <div>
-      <h1>Folder Page</h1>
+      <LibraryNav />
+      <Folder />
     </div>
   );
 };

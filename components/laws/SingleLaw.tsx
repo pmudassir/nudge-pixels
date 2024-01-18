@@ -24,6 +24,17 @@ import {
 import { Separator } from "../ui/separator";
 import { TbBlockquote } from "react-icons/tb";
 import { FaArrowTrendUp } from "react-icons/fa6";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface LawDataProps {
   id: number;
@@ -53,10 +64,52 @@ interface LawDataProps {
 }
 
 export const SingleLaw = () => {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(false);
   const [law, setLaw] = useState<LawDataProps | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [folderName, setFolderName] = useState("");
+  const [folders, setFolders] = useState<any[]>([]);
 
   const params = useParams();
+
+  const handleCreateFolder = async () => {
+    try {
+      if (folderName.length === 0) return;
+
+      console.log(folderName);
+
+      const { data, error } = await supabase.from("folders").insert({
+        name: folderName,
+        updated_at: new Date(),
+        type: "Folder",
+        client: "-None",
+      });
+
+      if (error) {
+        setError(true);
+      } else {
+        setFolderName("");
+        setIsOpen(false);
+      }
+    } catch (error) {
+      setError(true);
+    }
+  };
+
+  const fetchFolders = async () => {
+    try {
+      const { data, error } = await supabase.from("folders").select("*");
+      if (error) {
+        setError(true);
+        console.log(error);
+      } else {
+        setFolders(data);
+        console.log("data fetched", data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,7 +131,12 @@ export const SingleLaw = () => {
     };
 
     fetchData();
-  }, []);
+    fetchFolders();
+  }, [handleCreateFolder]);
+
+  if (error) {
+    return <div>Error fetching data</div>;
+  }
 
   return (
     <div className="py-10 px-20">
@@ -89,19 +147,38 @@ export const SingleLaw = () => {
         <DropdownMenuContent>
           <DropdownMenuLabel>Save to:</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <FolderClosed size={15} /> Crimes
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <FolderClosed size={15} /> Household
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <FolderClosed size={15} /> Consumer
-          </DropdownMenuItem>
+          {folders.map((folder) => (
+            <DropdownMenuItem key={folder.id}>
+              <FolderClosed className="mr-2" size={15} /> {folder.name}
+            </DropdownMenuItem>
+          ))}
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Create a Folder</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setIsOpen(true)}>
+            Create a Folder
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger></DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create New Folder</DialogTitle>
+            <DialogDescription>
+              <Input
+                type="text"
+                onChange={(e) => setFolderName(e.target.value)}
+                placeholder="Folder Name"
+                className="my-3"
+              />
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="submit" onClick={handleCreateFolder}>
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div>
         <div className="flex items-center gap-1 text-rose-600 mt-6 mb-2">
           <ScrollText size={16} />

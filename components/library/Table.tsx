@@ -1,6 +1,16 @@
 "use client";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
@@ -17,14 +27,37 @@ const columns: GridColDef[] = [
     headerName: "Last Modified",
     width: 200,
   },
+  {
+    field: "Options",
+    // headerName: "Option",
+    width: 100,
+    renderCell: (params) => {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger className="focus:outline-none flex">
+            <ChevronDown size={20} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>Rename</DropdownMenuItem>
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Delete</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Add a Note</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
 ];
 
 export default function DataTable(data: any) {
   const router = useRouter();
 
-  const handleRowClick = (params: any) => {
-    const folderId = params.row.id;
-    router.push(`/library/${folderId}`);
+  const handleCellClick = (params: any) => {
+    if (params.field === "name") {
+      const folderId = params.row.id;
+      router.push(`/library/${folderId}`);
+    }
   };
 
   return (
@@ -37,8 +70,8 @@ export default function DataTable(data: any) {
             paginationModel: { page: 0, pageSize: 10 },
           },
         }}
-        onRowClick={(params) => {
-          handleRowClick(params);
+        onCellClick={(params) => {
+          handleCellClick(params);
         }}
       />
     </div>
