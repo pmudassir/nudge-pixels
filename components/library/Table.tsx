@@ -9,11 +9,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -25,6 +24,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function DataTable(data: any) {
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [renameId, setRenameId] = useState("");
   const [deleteId, setDeleteId] = useState("");
@@ -34,7 +34,7 @@ export default function DataTable(data: any) {
 
   const handleRename = () => {
     const updateData = async (renameId: string, newName: string) => {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("folders")
         .update({ name: newName })
         .eq("id", renameId);
@@ -42,21 +42,52 @@ export default function DataTable(data: any) {
       if (error) {
         console.error("Error updating data:", error);
       } else {
-        console.log("Data updated successfully:", data);
+        fetchData();
+        setTableData(data);
       }
     };
     updateData(renameId, newName);
 
-    const updatedData = tableData.map((item: any) => {
-      if (item.id === renameId) {
-        return { ...item, name: newName };
-      }
-      return item;
-    });
-    setTableData(updatedData);
-
+    setNewName("");
+    setRenameId("");
     setIsRenameDialogOpen(false);
   };
+
+  const handleDelete = () => {
+    const deleteData = async (deleteId: string) => {
+      const { error } = await supabase
+        .from("folders")
+        .delete()
+        .eq("id", deleteId);
+
+      if (error) {
+        console.error("Error deleting data:", error);
+      }
+      fetchData();
+      setTableData(data);
+    };
+
+    deleteData(deleteId);
+    setDeleteId("");
+    setIsDeleteDialogOpen(false);
+  };
+
+  const fetchData = async () => {
+    try {
+      const { data, error } = await supabase.from("folders").select("*");
+      if (error) {
+        console.error("Error fetching data:", error);
+      } else {
+        setTableData(data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [tableData]);
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
@@ -75,7 +106,6 @@ export default function DataTable(data: any) {
     },
     {
       field: "Options",
-      // headerName: "Option",
       width: 100,
       renderCell: (params) => {
         return (
@@ -94,6 +124,7 @@ export default function DataTable(data: any) {
               <DropdownMenuItem
                 onClick={() => {
                   setDeleteId(params.row.id);
+                  setIsDeleteDialogOpen(true);
                 }}>
                 Delete
               </DropdownMenuItem>
@@ -117,7 +148,7 @@ export default function DataTable(data: any) {
     <>
       <div style={{ height: 640, width: "100%" }}>
         <DataGrid
-          rows={data.data}
+          rows={tableData}
           columns={columns}
           initialState={{
             pagination: {
@@ -143,6 +174,17 @@ export default function DataTable(data: any) {
           <DialogFooter>
             <Button onClick={handleRename}>Save</Button>
             <Button onClick={() => setIsRenameDialogOpen(false)}>Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={handleDelete}>Delete</Button>
+            <Button onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
