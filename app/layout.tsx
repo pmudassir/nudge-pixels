@@ -1,3 +1,4 @@
+import { NavigationSidebar } from "@/components/navigation/navigation-sidebar";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -18,7 +19,14 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+          <div className="h-full">
+            <div className="md:flex h-full w-[72px] z-30 flex-col fixed inset-y-0">
+              <NavigationSidebar />
+            </div>
+            <main className="md:pl-[72px]">{children}</main>
+          </div>
+        </body>
       </html>
     </ClerkProvider>
   );

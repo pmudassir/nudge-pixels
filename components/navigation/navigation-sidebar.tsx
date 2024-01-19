@@ -18,7 +18,7 @@ export const NavigationSidebar = () => {
   return (
     <div className="flex flex-col h-full bg-[#FBFAF5] w-full border-r-[0.5px] border-[#DCD6D9]">
       <div
-        className="mt-5 items-center flex flex-col gap-1 justify-center"
+        className="mt-5 items-center flex flex-col gap-1 justify-center cursor-pointer"
         onClick={() => router.push("/")}>
         <Image src={"/logo.png"} alt="logo" width={50} height={50} />
         <p className="bg-[#121217] text-white p-1 text-[8px] rounded-sm">
