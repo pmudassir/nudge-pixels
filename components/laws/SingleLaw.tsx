@@ -104,7 +104,6 @@ export const SingleLaw = () => {
         console.log(error);
       } else {
         setFolders(data);
-        console.log("data fetched", data);
       }
     } catch (error) {
       console.log(error);
