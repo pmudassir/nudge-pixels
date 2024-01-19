@@ -135,6 +135,28 @@ export default function DataTable(data: any) {
         );
       },
     },
+    {
+      field: "note",
+      width: 200,
+      renderCell: (params) => {
+        return (
+          <>
+            <p className="gap-2">{params.row.note}</p>
+            {params.row.note !== null && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="focus:outline-none flex">
+                  <ChevronDown size={20} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>Edit Note</DropdownMenuItem>
+                  <DropdownMenuItem>Delete Note</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </>
+        );
+      },
+    },
   ];
 
   const handleCellClick = (params: any) => {

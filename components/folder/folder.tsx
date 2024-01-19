@@ -10,7 +10,6 @@ interface Law {
   date: string;
   case_name: string;
   _id: string;
-  id: number;
 }
 
 export const Folder = () => {
@@ -58,11 +57,18 @@ export const Folder = () => {
           className="cursor-pointer hover:opacity-50"
           onClick={() => router.back()}
         />
-        <p>Folder Name</p>
+        <p>Saved Law:</p>
       </div>
       {law && (
-        <>
-          <div className="w-1/4">
+        <div className="mt-5 flex flex-col items-center gap-5">
+          <div className="cursor-pointer">
+            <h1
+              className="text-[#4667CA] font-semibold hover:underline"
+              onClick={() => router.push(`/law/${law._id}`)}>
+              {law.case_name}
+            </h1>
+          </div>
+          <div>
             <div className="flex items-center text-xs gap-1 text-rose-600">
               <ScrollText size={16} />
               <p>{law.doc_type}</p>
@@ -72,14 +78,7 @@ export const Folder = () => {
               <p className="text-gray-500">{law.date.split("T")[0]}</p>
             </div>
           </div>
-          <div className="w-3/4 cursor-pointer">
-            <h1
-              className="text-[#4667CA] font-semibold hover:underline"
-              onClick={() => router.push(`/law/${law._id}`)}>
-              {law.case_name}
-            </h1>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
