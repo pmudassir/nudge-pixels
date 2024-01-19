@@ -42,7 +42,6 @@ export const LawItem = ({ law }: { law: Law }) => {
   const [folders, setFolders] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
-  const [selectedFolder, setSelectedFolder] = useState("");
 
   const router = useRouter();
 
@@ -50,7 +49,6 @@ export const LawItem = ({ law }: { law: Law }) => {
 
   const handleAddLaw = async (id: any) => {
     try {
-      console.log("lawId:", lawId, "selectedFolder:", id);
       const addLawToFolder = async (lawId: string, id: any) => {
         const { error } = await supabase
           .from("folders")
@@ -68,8 +66,6 @@ export const LawItem = ({ law }: { law: Law }) => {
       addLawToFolder(lawId, id);
     } catch (error) {
       console.log(error);
-    } finally {
-      setSelectedFolder("");
     }
   };
 
@@ -153,16 +149,11 @@ export const LawItem = ({ law }: { law: Law }) => {
               <DropdownMenuContent>
                 <DropdownMenuLabel>Save to:</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {folders.map((folder, index) => (
+                {folders.map((folder) => (
                   <DropdownMenuItem
                     key={folder.id}
                     onClick={() => handleAddLaw(folder.id)}>
-                    <FolderClosed
-                      className="mr-2"
-                      size={15}
-                      onClick={() => setSelectedFolder(folder.id)}
-                    />{" "}
-                    {folder.name}
+                    <FolderClosed className="mr-2" size={15} /> {folder.name}
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />

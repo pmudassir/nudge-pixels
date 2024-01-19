@@ -72,6 +72,28 @@ export const SingleLaw = () => {
 
   const params = useParams();
 
+  const handleAddLaw = async (id: any) => {
+    try {
+      const addLawToFolder = async (lawId: string, id: any) => {
+        const { error } = await supabase
+          .from("folders")
+          .update({
+            law_id: lawId,
+          })
+          .eq("id", id);
+
+        if (error) {
+          console.error("Error adding law to folder:", error);
+        } else {
+          console.log("Law added to folder:", id);
+        }
+      };
+      addLawToFolder(law?._id ?? "", id);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleCreateFolder = async () => {
     try {
       if (folderName.length === 0) return;
@@ -147,7 +169,9 @@ export const SingleLaw = () => {
           <DropdownMenuLabel>Save to:</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {folders.map((folder) => (
-            <DropdownMenuItem key={folder.id}>
+            <DropdownMenuItem
+              key={folder.id}
+              onClick={() => handleAddLaw(folder.id)}>
               <FolderClosed className="mr-2" size={15} /> {folder.name}
             </DropdownMenuItem>
           ))}
