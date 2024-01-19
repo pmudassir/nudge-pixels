@@ -25,9 +25,12 @@ import { supabase } from "@/lib/supabaseClient";
 export default function DataTable(data: any) {
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isNoteDialogOpen, setIsNoteDialogOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [renameId, setRenameId] = useState("");
   const [deleteId, setDeleteId] = useState("");
+  const [note, setNote] = useState("");
+  const [noteId, setNoteId] = useState("");
   const [tableData, setTableData] = useState(data.data);
 
   const router = useRouter();
@@ -70,6 +73,34 @@ export default function DataTable(data: any) {
     deleteData(deleteId);
     setDeleteId("");
     setIsDeleteDialogOpen(false);
+  };
+
+  const handleNote = () => {
+    const createNote = async () => {
+      const { error } = await supabase
+        .from("folders")
+        .update({ note: note })
+        .eq("id", noteId);
+
+      if (error) {
+        console.error("Error creating note:", error);
+      } else {
+        fetchData();
+        setTableData(data);
+      }
+    };
+
+    createNote();
+    setNote("");
+    setNoteId("");
+    setIsNoteDialogOpen(false);
+  };
+
+  const handleDeleteNote = async (id: number) => {
+    const { error } = await supabase
+      .from("folders")
+      .update({ note: null })
+      .eq("id", id);
   };
 
   const fetchData = async () => {
@@ -129,7 +160,13 @@ export default function DataTable(data: any) {
                 Delete
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Add a Note</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setNoteId(params.row.id);
+                  setIsNoteDialogOpen(true);
+                }}>
+                Add a Note
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -148,8 +185,17 @@ export default function DataTable(data: any) {
                   <ChevronDown size={20} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem>Edit Note</DropdownMenuItem>
-                  <DropdownMenuItem>Delete Note</DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setNoteId(params.row.id);
+                      setIsNoteDialogOpen(true);
+                    }}>
+                    Edit Note
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleDeleteNote(params.row.id)}>
+                    Delete Note
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -207,6 +253,23 @@ export default function DataTable(data: any) {
           <DialogFooter>
             <Button onClick={handleDelete}>Delete</Button>
             <Button onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isNoteDialogOpen} onOpenChange={setIsNoteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Note:</DialogTitle>
+            <Input
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Note"
+              className="mt-5"
+            />
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={handleNote}>Add</Button>
+            <Button onClick={() => setIsNoteDialogOpen(false)}>Cancel</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
